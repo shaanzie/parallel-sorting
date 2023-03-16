@@ -1,0 +1,57 @@
+#!/bin/bash
+
+SORTING_ALG=$1
+RUN_TYPE=$2
+NTASKS_PER_NODE=$3
+NUM_NODES=$4
+
+########## Define Resources Needed with SBATCH Lines ##########
+ 
+#SBATCH --time=03:00:00             # limit of wall clock time - how long the job will run (same as -t)
+#SBATCH --ntasks-per-node=$NTASKS_PER_NODE                  # number of tasks - how many tasks (nodes) that you require (same as -n)
+#SBATCH --nodes=$NUM_NODES          # number of CPUs (or cores) per task (same as -c)
+#SBATCH --mem=8G                    # memory required per node - amount of memory (in bytes)
+#SBATCH --job-name SORT      # you can give your job a name for easier identification (same as -J)
+#SBATCH --exclusive
+ 
+########## Command Lines to Run ##########
+
+module purge
+module load intel/2021a
+  
+cd ~/parallel-sorting                   ### change to the directory where your code is located
+ 
+echo "---------------------------------"
+echo "$RUN_TYPE run for $SORTING_ALG"
+echo "---------------------------------"
+
+
+if [ "$RUN_TYPE" == "normal" ] then
+    mpicxx -Ofast $SORTING_ALG_$TYPE.cpp
+elif [ "$RUN_TYPE" == "openmp" ] then
+    mpicxx -Ofast -openmp $SORTING_ALG_$TYPE.cpp
+elif [ "$RUN_TYPE" == "mpi" ] then
+    mpicxx -Ofast $SORTING_ALG_$TYPE.cpp
+fi
+
+date=$(date '+%Y-%m-%d')
+
+FILENAME=$date-$SORTING_ALG-$TYPE-$NUM_NODES-$NTASKS_PER_NODE.csv
+
+echo "nodes,ntasks_per_node,num_procs,size,wall_time" | tee $FILENAME
+
+for(( SIZE = 2; SIZE <= 4096; SIZE *= 2 ))
+do
+    for(( NUM_PROC = 1; NUM_PROC <= 64; NUM_PROC *= 2 ))
+    do
+        echo "--------------------------------------------------"
+        echo "Running for MSG_SIZE:$SIZE on NUM_PROC:$NUM_PROC"
+        echo "--------------------------------------------------"
+        for(( ITER = 1; ITER < 100; ITER += 1 ))
+        do
+            mpirun -n $NUM_PROC ./a.out $NUM_NODES $NTASKS_PER_NODE $NUM_PROC $SIZE | tee -a $FILENAME
+        done
+    done
+done
+
+scontrol show job $SLURM_JOB_ID     ### write job information to output file
