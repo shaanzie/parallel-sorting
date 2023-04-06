@@ -3,11 +3,10 @@
 ########## Define Resources Needed with SBATCH Lines ##########
  
 #SBATCH --time=05:00:00             # limit of wall clock time - how long the job will run (same as -t)
-#SBATCH --ntasks-per-node=32                  # number of tasks - how many tasks (nodes) that you require (same as -n)
-#SBATCH --nodes=8          # number of CPUs (or cores) per task (same as -c)
+#SBATCH --ntasks-per-node=64                  # number of tasks - how many tasks (nodes) that you require (same as -n)
+#SBATCH --nodes=4          # number of CPUs (or cores) per task (same as -c)
 #SBATCH --job-name SORT      # you can give your job a name for easier identification (same as -J)
-#SBATCH --exclusive
- 
+
 ########## Command Lines to Run ##########
 
 module purge
@@ -19,7 +18,9 @@ date=$(date '+%Y-%m-%d')
 
 FILENAME=$date-bubble.csv
 
-for(( SIZE = 32; SIZE <= 4096; SIZE *= 2 ))
+echo "max_threads,max_procs,size,time,type" | tee $FILENAME
+
+for(( SIZE = 32; SIZE <= 2048; SIZE *= 2 ))
 do
     for(( THREADS = 1; THREADS <= 32; THREADS *= 2 ))
     do
