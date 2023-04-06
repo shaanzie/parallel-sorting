@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
     }   
     
-    printf("%d,%d,%d,%.10f,openmp\n", max_threads, 1, N, total / rounds);
+    printf("%d,%d,%d,%.10f,openmp\n", max_threads, N, 1, total / rounds);
 
     return 0;
 

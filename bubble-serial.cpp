@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
 
     }
 
-    printf("%d,%d,%d,%.10f,serial\n", 1, N, 1, total / rounds);
+    printf("%d,%d,%d,%.10f,serial\n", 1, 1, N, total / rounds);
 
     return 0;
 

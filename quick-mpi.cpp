@@ -1,7 +1,6 @@
 // Referred to the idea from https://computing.llnl.gov/tutorials/mpi/
 #include <bits/stdc++.h>
 #include <mpi.h>
-#include "omp.h"
 #include "bubble.h"
 
 using namespace std;
@@ -18,8 +17,6 @@ int main(int argc, char *argv[]) {
     int s;
     int o;
     MPI_Status status;
-    int max_threads = stoi(argv[2]);
-    omp_set_num_threads(max_threads);
 
     MPI_Init(&argc, &argv);
     
@@ -53,7 +50,7 @@ int main(int argc, char *argv[]) {
     // Compute chunksize
     chunksize = N / size;
     // Handle residue
-    if(N % size) {
+    if(N % size > 0) {
         chunksize++;
     }
 
@@ -63,13 +60,13 @@ int main(int argc, char *argv[]) {
     data.clear();
 
     // Compute size of chunk and sort
-    if(N >= (chunksize * (rank + 1))) {
+    if(N >= chunksize * (rank + 1)) {
         s = chunksize;
     }
     else {
-        s = N - (chunksize * rank);
+        s = N - chunksize * rank;
     }
-    openmp_bubble_sort(chunk, s);
+    serial_bubble_sort(chunk, s);
 
     // Idea: merge everything on processes with rank power of 2
     for(int step = 1; step < size; step *= 2) {
@@ -104,7 +101,7 @@ int main(int argc, char *argv[]) {
 
     if(rank == 0) {
 
-        printf("%d,%d,%d,%.10f,openmpi\n", max_threads, size, N, end_time - start_time);
+        printf("%d,%d,%d,%.10f,mpi\n", 1, N, size, end_time - start_time);
     }
 
     MPI_Finalize();

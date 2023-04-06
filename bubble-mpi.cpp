@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 
     if(rank == 0) {
 
-        printf("%d,%d,%d,%.10f,mpi\n", 1, N, size, end_time - start_time);
+        printf("%d,%d,%d,%.10f,mpi\n", 1, size, N, end_time - start_time);
     }
 
     MPI_Finalize();
