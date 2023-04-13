@@ -30,22 +30,22 @@ do
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, SERIAL"
             echo "----------------------------------------------------------------"
             g++ -Ofast -fopenmp -std=c++17 bubble-serial.cpp
-            ./a.out $SIZE $THREADS | tee -a $FILENAME
+            ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMP"
             echo "----------------------------------------------------------------"
             g++ -Ofast -fopenmp -std=c++17 bubble-openmp.cpp
-            ./a.out $SIZE $THREADS | tee -a $FILENAME
+            ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, MPI"
             echo "----------------------------------------------------------------"
             mpicxx -Ofast -fopenmp -std=c++17 bubble-mpi.cpp
-            mpirun -n $PROCS ./a.out $SIZE $THREADS | tee -a $FILENAME
+            mpirun -n $PROCS ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMPI"
             echo "----------------------------------------------------------------"
             mpicxx -Ofast -fopenmp -std=c++17 bubble-openmpi.cpp
-            mpirun -n $PROCS ./a.out $SIZE $THREADS | tee -a $FILENAME
+            mpirun -n $PROCS ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
         done
     done
 
