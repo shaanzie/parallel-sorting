@@ -2,24 +2,23 @@
 
 using namespace std;
 
-vector<int> random_arr(int N)
-{
+vector<double> random_arr(int N) {
 
     srand(0xFEEDFACE);
 
-    vector<int> A;
+    vector<double> A;
 
-    for (size_t i = 0; i < N; i++)
-    {
+    for (size_t i = 0; i < N; i++){
 
-        int num = fmod((int)rand(), 20);
+        double num = fmod((double)rand(), 20);
         A.push_back(num);
     }
 
     return A;
+
 }
 
-void serial_quick_sort(vector<int> &A, int start, int end)
+void serial_quick_sort(vector<double> &A, int start, int end)
 {
     if (start >= end)
         return;
@@ -34,18 +33,18 @@ void serial_quick_sort(vector<int> &A, int start, int end)
             j--;
         if (i <= j)
         {
-            int temp = A[i];
+            double temp = A[i];
             A[i] = A[j];
             A[j] = temp;
             i++;
             j--;
         }
     }
-    quicksort(A, start, j);
-    quicksort(A, i, end);
+    serial_quick_sort(A, start, j);
+    serial_quick_sort(A, i, end);
 }
 
-void openmp_quick_sort(vector<int> &A, int start, int end)
+void openmp_quick_sort(vector<double> &A, int start, int end)
 {
     if (start >= end)
         return;
@@ -60,7 +59,7 @@ void openmp_quick_sort(vector<int> &A, int start, int end)
             j--;
         if (i <= j)
         {
-            int temp = A[i];
+            double temp = A[i];
             A[i] = A[j];
             A[j] = temp;
             i++;
@@ -68,9 +67,39 @@ void openmp_quick_sort(vector<int> &A, int start, int end)
         }
     }
 #pragma omp task
-    quicksort(A, start, j);
+    openmp_quick_sort(A, start, j);
 #pragma omp task
-    quicksort(A, i, end);
+    openmp_quick_sort(A, i, end);
+}
+
+vector<double> merge(vector<double>& A, int M, vector<double>& B, int N) {
+
+    vector<double> result = vector<double>(N + M, 0);
+    int i = 0, j = 0;
+
+    for(int k = 0; k < N + M; k++) {
+
+        if(i >= M) {
+            result[k] = B[j];
+            j++;
+        }
+        else if(j >= N) {
+            result[k] = A[i];
+            i++;
+        }
+        else if(A[i] < B[j]) {
+            result[k] = A[i];
+            i++;
+        }
+        else {
+            result[k] = B[j];
+            j++;
+        }
+    }
+
+    return result;
+
+
 }
 
 void print_vector(vector<int> &A)
