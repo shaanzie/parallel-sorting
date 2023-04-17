@@ -18,34 +18,34 @@ date=$(date '+%Y-%m-%d')
 
 FILENAME=$date-quick.csv
 
-echo "max_threads,max_procs,size,time,type" | tee $FILENAME
+echo "max_threads,size,max_procs,time,type" | tee $FILENAME
 
 for(( SIZE = 32; SIZE <= 2048; SIZE *= 2 ))
 do
-    for(( THREADS = 1; THREADS <= 32; THREADS *= 2 ))
+    for(( THREADS = 1; THREADS <= 16; THREADS *= 2 ))
     do
-        for(( PROCS = 1; PROCS <= SIZE; PROCS *= 2 ))
+        for(( PROCS = 1; PROCS <= 16; PROCS *= 2 ))
         do
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, SERIAL"
             echo "----------------------------------------------------------------"
             g++ -Ofast -fopenmp -std=c++17 quick-serial.cpp
-            ./a.out $SIZE $THREADS | tee -a $FILENAME
+            ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMP"
             echo "----------------------------------------------------------------"
             g++ -Ofast -fopenmp -std=c++17 quick-openmp.cpp
-            ./a.out $SIZE $THREADS | tee -a $FILENAME
+            ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, MPI"
             echo "----------------------------------------------------------------"
             mpicxx -Ofast -fopenmp -std=c++17 quick-mpi.cpp
-            mpirun -n $PROCS ./a.out $SIZE $THREADS | tee -a $FILENAME
+            mpirun -n $PROCS ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMPI"
             echo "----------------------------------------------------------------"
             mpicxx -Ofast -fopenmp -std=c++17 quick-openmpi.cpp
-            mpirun -n $PROCS ./a.out $SIZE $THREADS | tee -a $FILENAME
+            mpirun -n $PROCS ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
         done
     done
 
