@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
     if (rank == 0)
     {
 
-        printf("%d,%d,%d,%.10f,mpi\n", max_threads, N, size, end_time - start_time);
+        printf("%d,%d,%d,%.10f,openmpi\n", max_threads, N, size, end_time - start_time);
     }
 
     // Collect stuff and kill every other process

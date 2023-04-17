@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
         start = omp_get_wtime();
 
         // Call our sorting function
-        openmp_merge_sort(A, A.size());
+        serial_merge_sort(A, A.size());
 
         // Stop timer!
         end = omp_get_wtime();
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
         total += end - start;
     }
 
-    printf("%d,%d,%d,%.10f,openmp\n", max_threads, N, procs, total / rounds);
+    printf("%d,%d,%d,%.10f,serial\n", max_threads, N, procs, total / rounds);
 
     return 0;
 }
