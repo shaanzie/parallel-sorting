@@ -82,6 +82,36 @@ void openmp_merge_sort(vector<double>& A, int N) {
 
 }
 
+vector<double> merge(vector<double>& A, int M, vector<double>& B, int N) {
+
+    vector<double> result = vector<double>(N + M, 0);
+    int i = 0, j = 0;
+
+    for(int k = 0; k < N + M; k++) {
+
+        if(i >= M) {
+            result[k] = B[j];
+            j++;
+        }
+        else if(j >= N) {
+            result[k] = A[i];
+            i++;
+        }
+        else if(A[i] < B[j]) {
+            result[k] = A[i];
+            i++;
+        }
+        else {
+            result[k] = B[j];
+            j++;
+        }
+    }
+
+    return result;
+
+
+}
+
 
 void print_vector(vector<double>& A) {
     for(auto i : A) {
