@@ -16,7 +16,7 @@ cd ~/parallel-sorting                   ### change to the directory where your c
 
 date=$(date '+%Y-%m-%d')
 
-FILENAME=$date-bubble.csv
+FILENAME=$date-merge.csv
 
 echo "max_threads,size,max_procs,time,type" | tee $FILENAME
 
@@ -29,22 +29,22 @@ do
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, SERIAL"
             echo "----------------------------------------------------------------"
-            g++ -Ofast -fopenmp -std=c++17 bubble-serial.cpp
+            g++ -Ofast -fopenmp -std=c++17 merge-serial.cpp
             ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMP"
             echo "----------------------------------------------------------------"
-            g++ -Ofast -fopenmp -std=c++17 bubble-openmp.cpp
+            g++ -Ofast -fopenmp -std=c++17 merge-openmp.cpp
             ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, MPI"
             echo "----------------------------------------------------------------"
-            mpicxx -Ofast -fopenmp -std=c++17 bubble-mpi.cpp
+            mpicxx -Ofast -fopenmp -std=c++17 merge-mpi.cpp
             mpirun -n $PROCS ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMPI"
             echo "----------------------------------------------------------------"
-            mpicxx -Ofast -fopenmp -std=c++17 bubble-openmpi.cpp
+            mpicxx -Ofast -fopenmp -std=c++17 merge-openmpi.cpp
             mpirun -n $PROCS ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
         done
     done

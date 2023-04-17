@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include <omp.h>
-#include "bubble.h"
+#include "merge.h"
 
 using namespace std;
 
@@ -9,11 +9,10 @@ int main(int argc, char *argv[])
 
     int N = stoi(argv[1]);            // Size of the array to be sorted
     int rounds = 10;                  // Number of rounds we want to do
-    int max_threads = stoi(argv[2]);  // Maximum threads we're gonna allow; doesn't matter here
-    int procs = stoi(argv[3]);        // Maximum number of processes we're gonna allow; doesn't matter here
+    int max_threads = stoi(argv[2]);  // Maximum threads we're gonna allow
+    int procs = stoi(argv[3]);        // Maximum number of processes we're gonna allow; Doesn't matter here
     omp_set_num_threads(max_threads); // Setting the environment variables
     double start, end, total;         // Timers
-
 
     // Generate a random array of doubles
     vector<double> A = random_arr(N);
@@ -25,7 +24,7 @@ int main(int argc, char *argv[])
         start = omp_get_wtime();
 
         // Call our sorting function
-        serial_bubble_sort(A, A.size());
+        openmp_merge_sort(A, A.size());
 
         // Stop timer!
         end = omp_get_wtime();
@@ -33,7 +32,7 @@ int main(int argc, char *argv[])
         total += end - start;
     }
 
-    printf("%d,%d,%d,%.10f,serial\n", max_threads, N, procs, total / rounds);
+    printf("%d,%d,%d,%.10f,openmp\n", max_threads, N, procs, total / rounds);
 
     return 0;
 }

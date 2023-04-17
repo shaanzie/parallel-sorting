@@ -5,7 +5,7 @@
 // Imports
 #include <bits/stdc++.h>
 #include <mpi.h>
-#include "bubble.h"
+#include "merge.h"
 
 using namespace std;
 
@@ -32,7 +32,6 @@ int main(int argc, char *argv[])
 
     // Our size comes as an input from the bash script (bubble-submitjob.sb)
     N = stoi(argv[1]);
-    int max_threads = stoi(argv[2]);
 
     // The maximum threads we're gonna allow for this process
     // Since we're doing just MPI, this value is never used, just for completeness sake
@@ -94,7 +93,7 @@ int main(int argc, char *argv[])
     {
         s = N - chunksize * rank;
     }
-    serial_bubble_sort(chunk, s);
+    serial_merge_sort(chunk, s);
 
     // Idea: merge everything on processes with rank power of 2
     for (int step = 1; step < size; step *= 2)
