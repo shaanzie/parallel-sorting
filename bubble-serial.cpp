@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     omp_set_num_threads(max_threads); // Setting the environment variables
     double start, end, total;         // Timers
 
+
     // Generate a random array of doubles
     vector<double> A = random_arr(N);
 
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
         total += end - start;
     }
 
-    printf("%d,%d,%d,%.10f,openmp\n", max_threads, N, procs, total / rounds);
+    printf("%d,%d,%d,%.10f,serial\n", max_threads, N, procs, total / rounds);
 
     return 0;
 }

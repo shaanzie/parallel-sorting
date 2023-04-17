@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 
     // Our size comes as an input from the bash script (bubble-submitjob.sb)
     N = stoi(argv[1]);
+    int max_threads = stoi(argv[2]);
 
     // The maximum threads we're gonna allow for this process
     // Since we're doing just MPI, this value is never used, just for completeness sake

@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     omp_set_num_threads(max_threads); // Setting the environment variables
     double start, end, total;         // Timers
 
+
     // Generate a random array of doubles
     vector<double> A = random_arr(N);
 
