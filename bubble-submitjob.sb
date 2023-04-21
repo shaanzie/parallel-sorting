@@ -2,9 +2,10 @@
 
 ########## Define Resources Needed with SBATCH Lines ##########
  
-#SBATCH --time=05:00:00             # limit of wall clock time - how long the job will run (same as -t)
+#SBATCH --time=10:00:00             # limit of wall clock time - how long the job will run (same as -t)
 #SBATCH --ntasks-per-node=64                  # number of tasks - how many tasks (nodes) that you require (same as -n)
 #SBATCH --nodes=4          # number of CPUs (or cores) per task (same as -c)
+#SBATCH --mem-per-cpu=3G
 #SBATCH --job-name SORT      # you can give your job a name for easier identification (same as -J)
 
 ########## Command Lines to Run ##########
@@ -20,32 +21,43 @@ FILENAME=$date-bubble.csv
 
 echo "max_threads,size,max_procs,time,type" | tee $FILENAME
 
-for(( SIZE = 32; SIZE <= 2048; SIZE *= 2 ))
+for(( SIZE = 32; SIZE <= 1048576; SIZE *= 16 ))
 do
-    for(( THREADS = 1; THREADS <= 16; THREADS *= 2 ))
+    THREADS=1
+    PROCS=1
+    
+    echo "----------------------------------------------------------------"
+    echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, SERIAL"
+    echo "----------------------------------------------------------------"
+    g++ -Ofast -fopenmp -std=c++17 -o bubble bubble-serial.cpp
+    ./bubble $SIZE $THREADS $PROCS | tee -a $FILENAME
+
+    for(( PROCS = 2; PROCS <= 8; PROCS *= 2 ))
     do
-        for(( PROCS = 1; PROCS <= 16; PROCS *= 2 ))
+        echo "----------------------------------------------------------------"
+        echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, MPI"
+        echo "----------------------------------------------------------------"
+        mpicxx -Ofast -fopenmp -std=c++17 -o bubble bubble-mpi.cpp
+        mpirun -n $PROCS ./bubble $SIZE $THREADS $PROCS | tee -a $FILENAME
+    done
+
+    for(( THREADS = 2; THREADS <= 16; THREADS *= 2 ))
+    do
+        PROCS=1
+        
+        echo "----------------------------------------------------------------"
+        echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMP"
+        echo "----------------------------------------------------------------"
+        g++ -Ofast -fopenmp -std=c++17 -o bubble bubble-openmp.cpp
+        ./bubble $SIZE $THREADS $PROCS | tee -a $FILENAME
+
+        for(( PROCS = 2; PROCS <= 8; PROCS *= 2 ))
         do
-            echo "----------------------------------------------------------------"
-            echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, SERIAL"
-            echo "----------------------------------------------------------------"
-            g++ -Ofast -fopenmp -std=c++17 bubble-serial.cpp
-            ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
-            echo "----------------------------------------------------------------"
-            echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMP"
-            echo "----------------------------------------------------------------"
-            g++ -Ofast -fopenmp -std=c++17 bubble-openmp.cpp
-            ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
-            echo "----------------------------------------------------------------"
-            echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, MPI"
-            echo "----------------------------------------------------------------"
-            mpicxx -Ofast -fopenmp -std=c++17 bubble-mpi.cpp
-            mpirun -n $PROCS ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMPI"
             echo "----------------------------------------------------------------"
-            mpicxx -Ofast -fopenmp -std=c++17 bubble-openmpi.cpp
-            mpirun -n $PROCS ./a.out $SIZE $THREADS $PROCS | tee -a $FILENAME
+            mpicxx -Ofast -fopenmp -std=c++17 -o bubble bubble-openmpi.cpp
+            mpirun -n $PROCS ./bubble $SIZE $THREADS $PROCS | tee -a $FILENAME
         done
     done
 

@@ -24,10 +24,7 @@ int main(int argc, char *argv[])
         start = omp_get_wtime();
 
     // Call our sorting function    
-    // We use parallel then single because the first call has to be in single but the recursive calls have to be in parallel
-#pragma omp parallel
-#pragma omp single
-        openmp_quick_sort(A, 0, A.size());
+        openmp_quick_sort(A, 0, A.size() - 1);
 
         // Stop timer!
         end = omp_get_wtime();

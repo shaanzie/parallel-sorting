@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     {
         s = N - chunksize * rank;
     }
-    serial_quick_sort(chunk, 0, s);
+    serial_quick_sort(chunk, 0, s - 1);
 
     // Idea: merge everything on processes with rank power of 2
     for (int step = 1; step < size; step *= 2)

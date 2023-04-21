@@ -5,6 +5,7 @@
 // Imports
 #include <bits/stdc++.h>
 #include <mpi.h>
+#include <omp.h>
 #include "quick.h"
 
 using namespace std;
@@ -36,6 +37,7 @@ int main(int argc, char *argv[])
     // The maximum threads we're gonna allow for this process
     // Since we're doing just MPI, this value is never used, just for completeness sake
     int max_threads = stoi(argv[2]);
+    omp_set_num_threads(max_threads);
 
     // We have to initialize the array only on rank 0, other processes just get chunks
     // Master-slave approach
@@ -93,9 +95,8 @@ int main(int argc, char *argv[])
     {
         s = N - chunksize * rank;
     }
-#pragma omp parallel
-#pragma omp single
-    openmp_quick_sort(chunk, 0, s);
+
+    openmp_quick_sort(chunk, 0, s - 1);
 
     // Idea: merge everything on processes with rank power of 2
     for (int step = 1; step < size; step *= 2)

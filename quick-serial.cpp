@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
         start = omp_get_wtime();
 
         // Call our sorting function
-        serial_quick_sort(A, 0, A.size());
+        serial_quick_sort(A, 0, A.size() - 1);
 
         // Stop timer!
         end = omp_get_wtime();

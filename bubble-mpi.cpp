@@ -12,16 +12,17 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 
-    int rank;            // Defines the rank we're on
-    int size;            // Defines the size of the communicating world
-    int N;               // Size of the array
-    vector<double> data; // Array holder vector
-    int chunksize;       // Chunk size for each process
-    double start_time;   // Timer start
-    double end_time;     // Timer end
-    int s;               // Placeholder variable for size of array on rank 0
-    int o;               // Placeholder variable for size of array coming as message
-    MPI_Status status;   // Status object
+    int rank;          // Defines the rank we're on
+    int size;          // Defines the size of the communicating world
+    int N;             // Size of the array
+    vector<double> A;  // Array holder vector
+    vector<double> B;  // Array verifier
+    int chunksize;     // Chunk size for each process
+    double start_time; // Timer start
+    double end_time;   // Timer end
+    int s;             // Placeholder variable for size of array on rank 0
+    int o;             // Placeholder variable for size of array coming as message
+    MPI_Status status; // Status object
 
     // Initializing MPI world
     MPI_Init(&argc, &argv);
@@ -32,7 +33,6 @@ int main(int argc, char *argv[])
 
     // Our size comes as an input from the bash script (bubble-submitjob.sb)
     N = stoi(argv[1]);
-    int max_threads = stoi(argv[2]);
 
     // The maximum threads we're gonna allow for this process
     // Since we're doing just MPI, this value is never used, just for completeness sake
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     {
 
         // Generate random array
-        data = random_arr(N);
+        A = random_arr(N);
 
         // Compute chunksize
         chunksize = N / size;
@@ -55,12 +55,14 @@ int main(int argc, char *argv[])
             chunksize++;
         }
 
-        // Pad data to match chunks, just allows me to not worry about insufficient data to be sent
+        // Pad A to match chunks, just allows me to not worry about insufficient A to be sent
         // Caused a lot of commotion about sends and recvs not ending
         for (int i = N; i < rank * chunksize; i++)
         {
-            data.push_back(0);
+            A.push_back(0);
         }
+        B = A;
+        stable_sort(B.begin(), B.end());
     }
 
     // Getting the house in order to start computation
@@ -80,10 +82,10 @@ int main(int argc, char *argv[])
     }
 
     // Scatter chunks to all processes so they roughly get equal chunks
-    // Doesn't really matter if its unequal to some processes, as we've padded the data well
+    // Doesn't really matter if its unequal to some processes, as we've padded the A well
     vector<double> chunk(chunksize);
-    MPI_Scatter(&data[0], chunksize, MPI_DOUBLE, &chunk[0], chunksize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    data.clear();
+    MPI_Scatter(&A[0], chunksize, MPI_DOUBLE, &chunk[0], chunksize, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    A.clear();
 
     // Compute size of chunk and sort
     if (N >= chunksize * (rank + 1))
@@ -122,10 +124,10 @@ int main(int argc, char *argv[])
             vector<double> other(o);
             MPI_Recv(&other[0], o, MPI_DOUBLE, rank + step, 0, MPI_COMM_WORLD, &status);
 
-            // Merge the data coming in from the data we have
-            data = merge(chunk, s, other, o);
+            // Merge the A coming in from the A we have
+            A = merge(chunk, s, other, o);
 
-            chunk = data;
+            chunk = A;
             s = s + o;
         }
     }
@@ -133,9 +135,15 @@ int main(int argc, char *argv[])
     // End timer!
     end_time = MPI_Wtime();
 
+    
+
     if (rank == 0)
     {
 
+        // if (A != B)
+        // {
+        //     cout << "Verification failed!" << endl;
+        // }
         printf("%d,%d,%d,%.10f,mpi\n", max_threads, N, size, end_time - start_time);
     }
 
