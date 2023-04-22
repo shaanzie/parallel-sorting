@@ -16,6 +16,8 @@ int main(int argc, char *argv[])
 
     // Generate a random array of doubles
     vector<double> A = random_arr(N);
+    vector<double> B = A;
+    stable_sort(B.begin(), B.end());
 
     for (int i = 0; i < rounds; i++)
     {
@@ -28,6 +30,11 @@ int main(int argc, char *argv[])
 
         // Stop timer!
         end = omp_get_wtime();
+
+        if (B != A)
+        {
+            cout << "Verification failed!" << endl;
+        }
 
         total += end - start;
     }

@@ -140,10 +140,10 @@ int main(int argc, char *argv[])
     if (rank == 0)
     {
 
-        // if (A != B)
-        // {
-        //     cout << "Verification failed!" << endl;
-        // }
+        if (A != B)
+        {
+            cout << "Verification failed!" << endl;
+        }
         printf("%d,%d,%d,%.10f,mpi\n", max_threads, N, size, end_time - start_time);
     }
 

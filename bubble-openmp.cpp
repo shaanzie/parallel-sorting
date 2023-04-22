@@ -31,10 +31,10 @@ int main(int argc, char *argv[])
         // Stop timer!
         end = omp_get_wtime();
 
-        // if (A != B)
-        // {
-        //     cout << "Verification failed!" << endl;
-        // }
+        if (A != B)
+        {
+            cout << "Verification failed!" << endl;
+        }
 
         total += end - start;
     }

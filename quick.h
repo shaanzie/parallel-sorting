@@ -25,7 +25,7 @@ int partition(vector<double> &A, int low, int high)
     int pivot = A[high];
     int i = low - 1;
 
-    for (int j = low; j <= high; j++)
+    for (int j = low; j <= high - 1; j++)
     {
         if (A[j] <= pivot)
         {
