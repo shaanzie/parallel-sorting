@@ -19,63 +19,50 @@ vector<double> random_arr(int N)
     return A;
 }
 
-void serial_quick_sort(vector<double> &A, int start, int end)
+int partition(vector<double> &A, int low, int high)
 {
-    if (start >= end)
-        return;
-    int pivot = A[end];
-    int i = start;
-    int j = end;
-    while (i <= j)
+
+    int pivot = A[high];
+    int i = low - 1;
+
+    for (int j = low; j <= high; j++)
     {
-        while (A[i] < pivot)
-            i++;
-        while (A[j] > pivot)
-            j--;
-        if (i <= j)
+        if (A[j] <= pivot)
         {
-            double temp = A[i];
-            A[i] = A[j];
-            A[j] = temp;
             i++;
-            j--;
+            swap(A[i], A[j]);
         }
     }
-    serial_quick_sort(A, start, j);
-    serial_quick_sort(A, i, end);
+    swap(A[i + 1], A[high]);
+    return i + 1;
+}
+
+void serial_quick_sort(vector<double> &A, int start, int end)
+{
+    if (start < end)
+    {
+        int p = partition(A, start, end);
+        serial_quick_sort(A, start, p - 1);
+        serial_quick_sort(A, p + 1, end);
+    }
 }
 
 void openmp_quick_sort(vector<double> &A, int start, int end)
 {
-    if (start >= end)
-        return;
-    int pivot = A[end];
-    int i = start;
-    int j = end;
-    while (i <= j)
+    if (start < end)
     {
-        while (A[i] < pivot)
-            i++;
-        while (A[j] > pivot)
-            j--;
-        if (i <= j)
-        {
-            double temp = A[i];
-            A[i] = A[j];
-            A[j] = temp;
-            i++;
-            j--;
-        }
-    }
+        int p = partition(A, start, end);
+
 #pragma omp parallel sections
-    {
-#pragma omp section
         {
-            openmp_quick_sort(A, start, j);
-        }
 #pragma omp section
-        {
-            openmp_quick_sort(A, i, end);
+            {
+                openmp_quick_sort(A, start, p - 1);
+            }
+#pragma omp section
+            {
+                openmp_quick_sort(A, p + 1, end);
+            }
         }
     }
 }
