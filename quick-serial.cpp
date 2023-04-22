@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include <omp.h>
-#include "bubble.h"
+#include "quick.h"
 
 using namespace std;
 
@@ -26,12 +26,12 @@ int main(int argc, char *argv[])
         start = omp_get_wtime();
 
         // Call our sorting function
-        openmp_bubble_sort(A, A.size());
+        serial_quick_sort(A, 0, A.size() - 1);
 
         // Stop timer!
         end = omp_get_wtime();
 
-        if (A != B)
+        if (B != A)
         {
             cout << "Verification failed!" << endl;
         }
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
         total += end - start;
     }
 
-    printf("%d,%d,%d,%.10f,openmp\n", max_threads, N, procs, total / rounds);
+    printf("%d,%d,%d,%.10f,serial\n", max_threads, N, procs, total / rounds);
 
     return 0;
 }

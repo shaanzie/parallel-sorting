@@ -5,7 +5,8 @@
 // Imports
 #include <bits/stdc++.h>
 #include <mpi.h>
-#include "bubble.h"
+#include <omp.h>
+#include "quick.h"
 
 using namespace std;
 
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
     // The maximum threads we're gonna allow for this process
     // Since we're doing just MPI, this value is never used, just for completeness sake
     int max_threads = stoi(argv[2]);
+    omp_set_num_threads(max_threads);
 
     // We have to initialize the array only on rank 0, other processes just get chunks
     // Master-slave approach
@@ -61,7 +63,7 @@ int main(int argc, char *argv[])
         {
             A.push_back(0);
         }
-        B = A;
+        vector<double> B = A;
         stable_sort(B.begin(), B.end());
     }
 
@@ -96,7 +98,8 @@ int main(int argc, char *argv[])
     {
         s = N - chunksize * rank;
     }
-    serial_bubble_sort(chunk, s);
+
+    openmp_quick_sort(chunk, 0, s - 1);
 
     // Idea: merge everything on processes with rank power of 2
     for (int step = 1; step < size; step *= 2)
@@ -135,16 +138,14 @@ int main(int argc, char *argv[])
     // End timer!
     end_time = MPI_Wtime();
 
-    
-
     if (rank == 0)
     {
-
-        if (A != B)
+        if (B != A)
         {
             cout << "Verification failed!" << endl;
         }
-        printf("%d,%d,%d,%.10f,mpi\n", max_threads, N, size, end_time - start_time);
+
+        printf("%d,%d,%d,%.10f,openmpi\n", max_threads, N, size, end_time - start_time);
     }
 
     // Collect stuff and kill every other process

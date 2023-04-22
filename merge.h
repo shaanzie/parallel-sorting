@@ -69,18 +69,24 @@ void serial_merge_sort(vector<double>& A, int N) {
 
 }
 
-void openmp_merge_sort(vector<double>& A, int N) {
 
-    #pragma omp parallel for shared(A, N)
-    for(int size = 1; size < N; size ++) {
-        for(int left = 0; left < N - 1; left ++) {
-            int mid = min(left + size - 1, N - 1);
-            int right = min(left + 2*size - 1, N - 1);
-            merge(A, left, mid, right);
+void openmp_merge_sort(vector<double>& A, int left, int right) {
+    if (left < right) {
+        int mid = (left + right) / 2;
+
+        #pragma omp parallel sections
+        {
+            #pragma omp section
+            openmp_merge_sort(A, left, mid);
+
+            #pragma omp section
+            openmp_merge_sort(A, mid + 1, right);
         }
-    }
 
+        merge(A, left, mid, right);
+    }
 }
+
 
 vector<double> merge(vector<double>& A, int M, vector<double>& B, int N) {
 

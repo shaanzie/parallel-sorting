@@ -5,7 +5,7 @@
 // Imports
 #include <bits/stdc++.h>
 #include <mpi.h>
-#include "bubble.h"
+#include "quick.h"
 
 using namespace std;
 
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     {
         s = N - chunksize * rank;
     }
-    serial_bubble_sort(chunk, s);
+    serial_quick_sort(chunk, 0, s - 1);
 
     // Idea: merge everything on processes with rank power of 2
     for (int step = 1; step < size; step *= 2)
@@ -135,15 +135,14 @@ int main(int argc, char *argv[])
     // End timer!
     end_time = MPI_Wtime();
 
-    
-
     if (rank == 0)
     {
 
-        if (A != B)
+        if (B != A)
         {
             cout << "Verification failed!" << endl;
         }
+
         printf("%d,%d,%d,%.10f,mpi\n", max_threads, N, size, end_time - start_time);
     }
 

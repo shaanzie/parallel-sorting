@@ -17,7 +17,7 @@ cd ~/parallel-sorting                   ### change to the directory where your c
 
 date=$(date '+%Y-%m-%d')
 
-FILENAME=$date-merge.csv
+FILENAME=$date-quick.csv
 
 echo "max_threads,size,max_procs,time,type" | tee $FILENAME
 
@@ -26,19 +26,19 @@ do
     THREADS=1
     PROCS=1
     
-    # echo "----------------------------------------------------------------"
-    # echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, SERIAL"
-    # echo "----------------------------------------------------------------"
-    # g++ -Ofast -fopenmp -std=c++17 -o merge merge-serial.cpp
-    # ./merge $SIZE $THREADS $PROCS | tee -a $FILENAME
+    echo "----------------------------------------------------------------"
+    echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, SERIAL"
+    echo "----------------------------------------------------------------"
+    g++ -Ofast -fopenmp -std=c++17 -o quick quick-serial.cpp
+    ./quick $SIZE $THREADS $PROCS | tee -a $FILENAME
 
     for(( PROCS = 2; PROCS <= 8; PROCS *= 2 ))
     do
         echo "----------------------------------------------------------------"
         echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, MPI"
         echo "----------------------------------------------------------------"
-        mpicxx -Ofast -fopenmp -std=c++17 -o merge merge-mpi.cpp
-        mpirun -n $PROCS ./merge $SIZE $THREADS $PROCS | tee -a $FILENAME
+        mpicxx -Ofast -fopenmp -std=c++17 -o quick quick-mpi.cpp
+        mpirun -n $PROCS ./quick $SIZE $THREADS $PROCS | tee -a $FILENAME
     done
 
     for(( THREADS = 2; THREADS <= 16; THREADS *= 2 ))
@@ -48,16 +48,16 @@ do
         echo "----------------------------------------------------------------"
         echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMP"
         echo "----------------------------------------------------------------"
-        g++ -Ofast -fopenmp -std=c++17 -o merge merge-openmp.cpp
-        ./merge $SIZE $THREADS $PROCS | tee -a $FILENAME
+        g++ -Ofast -fopenmp -std=c++17 -o quick quick-openmp.cpp
+        ./quick $SIZE $THREADS $PROCS | tee -a $FILENAME
 
         for(( PROCS = 2; PROCS <= 8; PROCS *= 2 ))
         do
             echo "----------------------------------------------------------------"
             echo "Running for SIZE:$SIZE, THREADS: $THREADS, PROCS:$PROCS, OPENMPI"
             echo "----------------------------------------------------------------"
-            mpicxx -Ofast -fopenmp -std=c++17 -o merge merge-openmpi.cpp
-            mpirun -n $PROCS ./merge $SIZE $THREADS $PROCS | tee -a $FILENAME
+            mpicxx -Ofast -fopenmp -std=c++17 -o quick quick-openmpi.cpp
+            mpirun -n $PROCS ./quick $SIZE $THREADS $PROCS | tee -a $FILENAME
         done
     done
 

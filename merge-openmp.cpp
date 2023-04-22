@@ -16,6 +16,8 @@ int main(int argc, char *argv[])
 
     // Generate a random array of doubles
     vector<double> A = random_arr(N);
+    vector<double> B = A;
+    stable_sort(B.begin(), B.end());
 
     for (int i = 0; i < rounds; i++)
     {
@@ -24,11 +26,15 @@ int main(int argc, char *argv[])
         start = omp_get_wtime();
 
         // Call our sorting function
-        openmp_merge_sort(A, A.size());
+        openmp_merge_sort(A, 0, A.size());
 
         // Stop timer!
         end = omp_get_wtime();
 
+        if (B != A)
+        {
+            cout << "Verification failed!" << endl;
+        }
         total += end - start;
     }
 
